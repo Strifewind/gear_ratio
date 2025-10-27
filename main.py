@@ -72,26 +72,11 @@ def get_cog_teeth():
 
 def calculate_gear_ratio(chainring, cog):
     """
-    Compute the gear ratio between chainring and cog.
+    Calculates the gear ratio of a bicycle based on the number of teeth on the chainring and cog.
 
-    The gear ratio is defined as chainring divided by cog.
-
-    Parameters
-    ----------
-    chainring : int or float
-        Number of teeth on the front chainring.
-    cog : int or float
-        Number of teeth on the rear cog. Must be non-zero.
-
-    Returns
-    -------
-    float
-        The gear ratio (chainring / cog).
-
-    Raises
-    ------
-    ZeroDivisionError
-        If ``cog`` is zero.
+    :param chainring: Number of teeth on the front chainring.
+    :param cog: Number of teeth on the rear cog.
+    :return: The gear ratio as a float, calculated by dividing the chainring teeth by the cog teeth.
     """
 
     gear_ratio = chainring / cog
