@@ -10,6 +10,8 @@
 #                           the variables.
 #                   A02.1 - 10/21/2024 - Refactor code to add functions
 #                           and improve readability. Add comments.
+#                   A02.2 - 10/26/2024 - Update docstring with a corrected
+#                           format. Added a description in welcome message.
 #******************************************************************************
 def main():
 
@@ -34,7 +36,13 @@ def print_intro():
     :return: none
     """
 
-    print("Welcome to the bicycle gear ratio calculator!\n")
+    print("""\t\tWelcome to Gear Calculator!
+Input your chainring and cog sizes to find the perfect ratio!\n
+\tGear ratio = Chainring teeth / Cog teeth\n
+A lower gear ratio will mean easier pedaling, ideal for climbing hills.
+While a higher gear ratio means harder pedaling but more speed, ideal
+for flat roads.
+          """)
 
 
 def get_bike_id():
@@ -72,11 +80,13 @@ def get_cog_teeth():
 
 def calculate_gear_ratio(chainring, cog):
     """
-    Calculates the gear ratio of a bicycle based on the number of teeth on the chainring and cog.
+    Calculates the gear ratio of a bicycle based on the number of teeth on 
+        the chainring and cog.
 
     :param chainring: Number of teeth on the front chainring.
     :param cog: Number of teeth on the rear cog.
-    :return: The gear ratio as a float, calculated by dividing the chainring teeth by the cog teeth.
+    :return: The gear ratio as a float, calculated by dividing the chainring 
+        teeth by the cog teeth.
     """
 
     gear_ratio = chainring / cog
