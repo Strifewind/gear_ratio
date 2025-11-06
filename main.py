@@ -15,15 +15,19 @@ def main():
 
     bike_id = ""
     chainring = 0
+    chainring_count = 0
     cog = 0
+    cog_count = 0
     gear_ratio = 0.0
+    num_gear = 0
 
     print_intro()
     bike_id = get_bike_id()
-    chainring = get_chainring_teeth()
-    cog = get_cog_teeth()
+    chainring, chainring_count = get_sprocket("Chainring")
+    cog, cog_count = get_sprocket("Cog")
     gear_ratio = calculate_gear_ratio(chainring, cog)
-    print_bike_info(bike_id, chainring, cog, gear_ratio)
+    num_gear = calculate_num_gear(chainring_count, cog_count)
+    print_bike_info(bike_id, chainring, cog, gear_ratio, num_gear)
     print_outro()
 
 
@@ -48,27 +52,22 @@ def get_bike_id():
     return bike_id
 
 
-def get_chainring_teeth():
-    """
-    Prompts for the number of teeth on the front chainring.
-    :param: none
-    :return: number of chainring teeth, int
-    """
-
-    chainring = int(input("Enter the number of teeth on the chainring: "))
-    return chainring
-
-
-def get_cog_teeth():
-    """
-    Prompts for the number of teeth on the rear cog.
-    :param: none
-    :return: number of cog teeth, int
-    """
-
-    cog = int(input("Enter the number of teeth on the cog: "))
-    return cog
-
+def get_sprocket(prompt):
+    count = 0
+    compare = 0
+    sprockets = 0
+    print(f"Enter the sprocket sizes for {prompt} (enter 0 to exit): ")
+    sprockets = int(input(""))
+    compare = sprockets
+    while sprockets != 0:
+        count += 1
+        if sprockets >= compare:
+            compare = sprockets
+            sprockets = int(input(""))
+        else:
+            sprockets = int(input(""))
+    return compare, count
+        
 
 def calculate_gear_ratio(chainring, cog):
     """
@@ -98,7 +97,12 @@ def calculate_gear_ratio(chainring, cog):
     return gear_ratio
 
 
-def print_bike_info(bike_id, chainring, cog, gear_ratio):
+def calculate_num_gear(chainring_count, cog_count):
+    num_gear = chainring_count * cog_count
+    return num_gear
+
+
+def print_bike_info(bike_id, chainring, cog, gear_ratio, num_gear):
     """
     Prints formatted bike information and the computed gear ratio.
     :param bike_id: the bike identifier (string)
@@ -108,8 +112,8 @@ def print_bike_info(bike_id, chainring, cog, gear_ratio):
     :return: none
     """
 
-    print("\nBike ID - Chainring - Cog - Gear ratio")
-    print(f"{bike_id}   |   {chainring}   |   {cog}   |   {gear_ratio:.2f}")
+    print("\nBike ID - Chainring - Cog - Gear ratio - # Gears")
+    print(f"{bike_id}   |   {chainring}   |   {cog}   |   {gear_ratio:.2f}   |   {num_gear}")
 
 
 def print_outro():
