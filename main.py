@@ -14,20 +14,22 @@
 def main():
 
     bike_id = ""
-    chainring = 0
+    chainring_big = 0
+    chainring_small = 0
     chainring_count = 0
-    cog = 0
+    cog_big = 0
+    cog_small = 0
     cog_count = 0
     gear_ratio = 0.0
     num_gear = 0
 
     print_intro()
     bike_id = get_bike_id()
-    chainring, chainring_count = get_sprocket("Chainring")
-    cog, cog_count = get_sprocket("Cog")
-    gear_ratio = calculate_gear_ratio(chainring, cog)
+    chainring_big, chainring_small, chainring_count = get_sprocket("Chainring")
+    cog_big, cog_small, cog_count = get_sprocket("Cog")
+    gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
     num_gear = calculate_num_gear(chainring_count, cog_count)
-    print_bike_info(bike_id, chainring, cog, gear_ratio, num_gear)
+    print_bike_info(bike_id, chainring_big, chainring_small, cog_big, cog_small, gear_ratio, num_gear)
     print_outro()
 
 
@@ -54,22 +56,32 @@ def get_bike_id():
 
 def get_sprocket(prompt):
     count = 0
-    compare = 0
-    sprockets = 0
+    compare_large = None
+    compare_small = None
+    sprockets = None
     print(f"Enter the sprocket sizes for {prompt} (enter 0 to exit): ")
-    sprockets = int(input(""))
-    compare = sprockets
     while sprockets != 0:
-        count += 1
-        if sprockets >= compare:
-            compare = sprockets
+        try:
             sprockets = int(input(""))
-        else:
-            sprockets = int(input(""))
-    return compare, count
+            if sprockets < 0:
+                print("Please enter only positive whole numbers.")
+                continue
+            if sprockets == 0:
+                break
+
+            count += 1
+
+            if compare_large is None or sprockets > compare_large:
+                compare_large = sprockets
+            if compare_small is None or sprockets < compare_small:
+                compare_small = sprockets
+        except ValueError:
+            print("Invalid input. Please enter a whole number.")
+
+    return compare_large, compare_small, count
         
 
-def calculate_gear_ratio(chainring, cog):
+def calculate_gear_ratio(chainring_big, cog_small):
     """
     Compute the gear ratio between chainring and cog.
 
@@ -93,7 +105,7 @@ def calculate_gear_ratio(chainring, cog):
         If ``cog`` is zero.
     """
 
-    gear_ratio = chainring / cog
+    gear_ratio = chainring_big / cog_small
     return gear_ratio
 
 
@@ -102,7 +114,7 @@ def calculate_num_gear(chainring_count, cog_count):
     return num_gear
 
 
-def print_bike_info(bike_id, chainring, cog, gear_ratio, num_gear):
+def print_bike_info(bike_id, chainring_big, chainring_small, cog_big, cog_small, gear_ratio, num_gear):
     """
     Prints formatted bike information and the computed gear ratio.
     :param bike_id: the bike identifier (string)
@@ -112,8 +124,8 @@ def print_bike_info(bike_id, chainring, cog, gear_ratio, num_gear):
     :return: none
     """
 
-    print("\nBike ID - Chainring - Cog - Gear ratio - # Gears")
-    print(f"{bike_id}   |   {chainring}   |   {cog}   |   {gear_ratio:.2f}   |   {num_gear}")
+    print(f"\n{'Bike ID':<10} | {'Chainring':<12} | {'Cog':<12} | {'Gear Ratio':<12} | {'# Gears':<8}")
+    print(f"{bike_id:<10} | {f'{chainring_small}-{chainring_big}':<12} | {f'{cog_small}-{cog_big}':<12} | {gear_ratio:<12.2f} | {num_gear:<8}")
 
 
 def print_outro():
