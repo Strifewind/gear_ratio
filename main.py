@@ -1,7 +1,7 @@
 #******************************************************************************
 # Author:           Brian O'Grady
-# Assignment:       Assignment 02
-# Date:             10/21/2025
+# Assignment:       Assignment 03
+# Date:             11/10/2025
 # Description:      This program calculates the gear ratio by dividing the 
 #                   number of teeth on the front chainring by the number
 #                   of teeth on the rear cog.
@@ -10,26 +10,15 @@
 #                           the variables.
 #                   A02.1 - 10/21/2024 - Refactor code to add functions
 #                           and improve readability. Add comments.
+#                   A02.2 - 10/26/2024 - Update docstring with a corrected
+#                           format. Added a description in welcome message.
+#                   A03.1 - 11/10/2025 - Cleaned up functions to reduce reused
+#                           code. Added Menu loop to allow user controls.
 #******************************************************************************
 def main():
 
-    bike_id = ""
-    chainring_big = 0
-    chainring_small = 0
-    chainring_count = 0
-    cog_big = 0
-    cog_small = 0
-    cog_count = 0
-    gear_ratio = 0.00
-    num_gear = 0
-
     print_intro()
-    bike_id = get_bike_id()
-    chainring_big, chainring_small, chainring_count = get_sprocket("Chainring")
-    cog_big, cog_small, cog_count = get_sprocket("Cog")
-    gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
-    num_gear = calculate_num_gear(chainring_count, cog_count)
-    print_bike_info(bike_id, chainring_big, chainring_small, cog_big, cog_small, gear_ratio, num_gear)
+    get_option()
     print_outro()
 
 
@@ -40,21 +29,66 @@ def print_intro():
     :return: none
     """
 
-    print("Welcome to the bicycle gear ratio calculator!\n")
+    print("\t\tWelcome to Gear Calculator!")
+    print("Let us explore your bike and make calculating gear ratios easy.")
+
+
+def print_options():
+        print("""
+Select from the following options
+
+1.     Program overview 
+2.     Enter your bike details
+3.     Close program
+          """)
+
 
 
 def get_option():
+
+    bike_id = ""
+    chainring_big = 0
+    chainring_small = 0
+    chainring_count = 0
+    cog_big = 0
+    cog_small = 0
+    cog_count = 0
+    gear_ratio = 0.00
+    num_gear = 0
+    option = 0
+
+    print_options()
     option = int(input("Enter your response: "))
+
     while option != 3:
         if option == 1:
             print("You have selected to print a program description")
+            print_description()
+            print_options()
+            option = int(input("Enter your response: "))
 
         elif option == 2:
             print("You have decided calculate a gear ratio for a bike")
-
-
+            bike_id = get_bike_id()
+            chainring_big, chainring_small, chainring_count = get_sprocket("Chainring")
+            cog_big, cog_small, cog_count = get_sprocket("Cog")
+            gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
+            num_gear = calculate_num_gear(chainring_count, cog_count)
+            print_bike_info(bike_id, chainring_big, chainring_small, cog_big, cog_small, gear_ratio, num_gear)
+            option = 3
     return 
 
+
+def print_description():
+    print("""
+Input your chainring and cog sizes to find the perfect ratio!\n
+\tGear ratio = Chainring teeth / Cog teeth
+\t# Gears = count of chainring + count of cog\n
+A lower gear ratio will mean easier pedaling, ideal for climbing hills.
+While a higher gear ratio means harder pedaling but more speed, ideal
+for flat roads.
+          """)
+    
 
 def get_bike_id():
     """
