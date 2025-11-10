@@ -55,6 +55,15 @@ def get_bike_id():
 
 
 def get_sprocket(prompt):
+
+    """
+    This function asks the user to enter sprocket sizes and keeps track of the largest, smallest, and total number 
+    of valid sprockets entered.
+
+    :param prompt: A message to show the user when asking for sprocket sizes.
+    :return: A tuple with the largest sprocket, smallest sprocket, and the total count of valid sprockets entered.
+    """
+
     count = 0
     compare_large = 0
     compare_small = 0
@@ -74,20 +83,48 @@ def get_sprocket(prompt):
         
 
 def calculate_gear_ratio(chainring_big, cog_small):
+
     """
-   
+    This function finds the gear ratio by dividing the number of teeth on the largest front gear by the number of smallest 
+    teeth on the back gear.
+
+    :param chainring_big: The number of teeth on the front chainring.
+    :param cog_small: The number of teeth on the rear cog.
+    :return: The gear ratio as a decimal number.
     """
+
 
     gear_ratio = chainring_big / cog_small
     return gear_ratio
 
 
 def calculate_num_gear(chainring_count, cog_count):
+
+    """
+    This function calculates the total number of gear combinations by multiplying the number of front gears by the number of 
+    rear gears.
+
+    :param chainring_count: The number of gears on the front (chainrings).
+    :param cog_count: The number of gears on the back (cogs).
+    :return: The total number of gear combinations.
+    """
+
     num_gear = chainring_count * cog_count
     return num_gear
 
 
 def compare(sprockets, compare_small, compare_large):
+    
+    """
+    This function checks if the current sprocket value is smaller or larger than the ones being compared, and updates them 
+    if needed.
+
+    :param sprockets: The current sprocket value to compare.
+    :param compare_small: The smallest sprocket value found so far.
+    :param compare_large: The largest sprocket value found so far.
+    :return: A tuple with the updated largest and smallest sprocket values.
+    """
+
     if compare_large == 0 or sprockets > compare_large:
         compare_large = sprockets
     if compare_small == 0 or sprockets < compare_small:
