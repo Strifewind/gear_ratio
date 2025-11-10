@@ -43,6 +43,19 @@ def print_intro():
     print("Welcome to the bicycle gear ratio calculator!\n")
 
 
+def get_option():
+    option = int(input("Enter your response: "))
+    while option != 3:
+        if option == 1:
+            print("You have selected to print a program description")
+
+        elif option == 2:
+            print("You have decided calculate a gear ratio for a bike")
+
+
+    return 
+
+
 def get_bike_id():
     """
     Prompts for the bike ID used to identify the bicycle.
