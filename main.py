@@ -34,7 +34,15 @@ def print_intro():
 
 
 def print_options():
-        print("""
+        
+    """
+    Displays a list of menu options for the user to choose from.
+
+    :param: None
+    :return: None
+    """
+
+    print("""
 Select from the following options
 
 1.     Program overview 
@@ -45,6 +53,20 @@ Select from the following options
 
 
 def get_option():
+
+    """
+    Handles user interaction for selecting and executing program options.
+
+    This function displays a menu and processes user input to either:
+    - Show a program description
+    - Collect bike details and calculate gear ratio
+    - Exit the program
+
+    It uses helper functions to gather input and perform calculations.
+
+    :param: None
+    :return: None
+    """
 
     bike_id = ""
     chainring_big = 0
@@ -76,10 +98,21 @@ def get_option():
             num_gear = calculate_num_gear(chainring_count, cog_count)
             print_bike_info(bike_id, chainring_big, chainring_small, cog_big, cog_small, gear_ratio, num_gear)
             option = 3
-    return 
 
 
 def print_description():
+
+    """
+    Prints a description of how gear ratios work for bicycles.
+
+    This function explains how to calculate gear ratio and number of gears,
+    and describes the benefits of low vs. high gear ratios for different
+    riding conditions.
+
+    :param: None
+    :return: None
+    """
+
     print("""
 Input your chainring and cog sizes to find the perfect ratio!\n
 \tGear ratio = Chainring teeth / Cog teeth
@@ -91,6 +124,7 @@ for flat roads.
     
 
 def get_bike_id():
+
     """
     Prompts for the bike ID used to identify the bicycle.
     :param: none
@@ -179,6 +213,7 @@ def compare(sprockets, compare_small, compare_large):
     return compare_large, compare_small
 
 def print_bike_info(bike_id, chainring_big, chainring_small, cog_big, cog_small, gear_ratio, num_gear):
+    
     """
     Prints formatted bike information and the computed gear ratio.
     :param bike_id: the bike identifier (string)
@@ -193,6 +228,7 @@ def print_bike_info(bike_id, chainring_big, chainring_small, cog_big, cog_small,
 
 
 def print_outro():
+
     """
     Prints a short closing message to the user.
     :param: none
