@@ -51,7 +51,6 @@ Select from the following options
           """)
 
 
-
 def get_option():
 
     """
@@ -222,6 +221,7 @@ def compare(sprockets, compare_small, compare_large):
             compare_small = sprockets
     return compare_large, compare_small
 
+
 def print_bike_info(bike_id, 
                     chainring_big, 
                     chainring_small, 
@@ -262,5 +262,6 @@ def print_outro():
     """
 
     print("\nThank you for using the bicycle gear ratio calculator!")
+
 
 main()
