@@ -1,8 +1,8 @@
-#*****************************************************************************
+# *****************************************************************************
 # Author:           Brian O'Grady
 # Assignment:       Assignment 03
 # Date:             11/10/2025
-# Description:      This program calculates the gear ratio by dividing the 
+# Description:      This program calculates the gear ratio by dividing the
 #                   number of teeth on the front chainring by the number
 #                   of teeth on the rear cog.
 # Revisions:        A01.1 - 09/06/2024 - Initialization, set up variables
@@ -14,11 +14,57 @@
 #                           format. Added a description in welcome message.
 #                   A03.1 - 11/10/2025 - Cleaned up functions to reduce reused
 #                           code. Added Menu loop to allow user controls.
-#*****************************************************************************
+#                   A03.2 - 11/16/2025 - Removed logic from get_options, added
+#                           module for input validation. Changed inputs to
+#                           use the validation module and functions.
+# *****************************************************************************
+import valid as v
+
+DESCRIPTION = 1
+SUBMIT_BIKE = 2
+QUIT = 3
+
+
 def main():
+    bike_id = ""
+    chainring_big = 0
+    chainring_small = 0
+    chainring_count = 0
+    cog_big = 0
+    cog_small = 0
+    cog_count = 0
+    gear_ratio = 0.00
+    num_gear = 0
+    option = 0
 
     print_intro()
-    get_option()
+    print_options()
+    option = get_option()
+
+    while option != QUIT:
+        if option == DESCRIPTION:
+            print("You have selected to print a program description")
+            print_description()
+            print_options()
+            option = get_option()
+
+        elif option == SUBMIT_BIKE:
+            print("You have decided to calculate a gear ratio for a bike")
+            bike_id = get_bike_id()
+            (chainring_big,
+             chainring_small,
+             chainring_count) = get_sprocket("Chainring")
+            cog_big, cog_small, cog_count = get_sprocket("Cog")
+            gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
+            num_gear = calculate_num_gear(chainring_count, cog_count)
+            print_bike_info(bike_id,
+                            chainring_big,
+                            chainring_small,
+                            cog_big, cog_small,
+                            gear_ratio,
+                            num_gear)
+
+            option = get_option()
     print_outro()
 
 
@@ -34,7 +80,6 @@ def print_intro():
 
 
 def print_options():
-        
     """
     Displays a list of menu options for the user to choose from.
 
@@ -51,63 +96,7 @@ Select from the following options
           """)
 
 
-def get_option():
-
-    """
-    Handles user interaction for selecting and executing program options.
-
-    This function displays a menu and processes user input to either:
-    - Show a program description
-    - Collect bike details and calculate gear ratio
-    - Exit the program
-
-    It uses helper functions to gather input and perform calculations.
-
-    :param: None
-    :return: None
-    """
-
-    bike_id = ""
-    chainring_big = 0
-    chainring_small = 0
-    chainring_count = 0
-    cog_big = 0
-    cog_small = 0
-    cog_count = 0
-    gear_ratio = 0.00
-    num_gear = 0
-    option = 0
-
-    print_options()
-    option = int(input("Enter your response: "))
-
-    while option != 3:
-        if option == 1:
-            print("You have selected to print a program description")
-            print_description()
-            print_options()
-            option = int(input("Enter your response: "))
-
-        elif option == 2:
-            print("You have decided to calculate a gear ratio for a bike")
-            bike_id = get_bike_id()
-            (chainring_big, 
-            chainring_small, 
-            chainring_count) = get_sprocket("Chainring")
-            cog_big, cog_small, cog_count = get_sprocket("Cog")
-            gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
-            num_gear = calculate_num_gear(chainring_count, cog_count)
-            print_bike_info(bike_id, 
-                            chainring_big, 
-                            chainring_small, 
-                            cog_big, cog_small, 
-                            gear_ratio, 
-                            num_gear)
-            option = 3
-
-
 def print_description():
-
     """
     Prints a description of how gear ratios work for bicycles.
 
@@ -127,108 +116,14 @@ A lower gear ratio will mean easier pedaling, ideal for climbing hills.
 While a higher gear ratio means harder pedaling but more speed, ideal
 for flat roads.
           """)
-    
-
-def get_bike_id():
-
-    """
-    Prompts for the bike ID used to identify the bicycle.
-    :param: none
-    :return: bike id entered by the user, string
-    """
-
-    bike_id = input("Enter a unique bike ID: ")
-    return bike_id
 
 
-def get_sprocket(prompt):
-
-    """
-    This function asks the user to enter sprocket sizes and keeps track of
-    the largest, smallest, and total number of valid sprockets entered.
-
-    :param prompt: A message to show the user when asking for sprocket sizes.
-    :return: A tuple with the largest sprocket, smallest sprocket, and the 
-    total count of valid sprockets entered.
-    """
-
-    count = 0
-    compare_large = 0
-    compare_small = 0
-
-    print(f"Enter the sprocket sizes for {prompt} (enter 0 to exit): ")
-    sprockets = int(input("Enter Sprocket: "))
-    while sprockets != 0:
-        if sprockets < 0:
-            print("Invalid")
-            sprockets = int(input("Enter Sprocket: "))
-        while sprockets > 0:
-            count += 1
-            compare_large, compare_small = compare(sprockets, 
-                                                    compare_small, 
-                                                    compare_large)
-            sprockets = int(input("Enter Sprocket: "))
-
-    return compare_large, compare_small, count
-        
-
-def calculate_gear_ratio(chainring_big, cog_small):
-
-    """
-    This function finds the gear ratio by dividing the number of teeth on the
-    largest front gear by the number of smallest teeth on the back gear.
-
-    :param chainring_big: The number of teeth on the front chainring.
-    :param cog_small: The number of teeth on the rear cog.
-    :return: The gear ratio as a float.
-    """
-
-
-    gear_ratio = chainring_big / cog_small
-    return gear_ratio
-
-
-def calculate_num_gear(chainring_count, cog_count):
-
-    """
-    This function calculates the total number of gear combinations by 
-    multiplying the number of front gears by the number of rear gears.
-
-    :param chainring_count: The number of gears on the front (chainrings).
-    :param cog_count: The number of gears on the back (cogs).
-    :return: The total number of gear combinations.
-    """
-
-    num_gear = chainring_count * cog_count
-    return num_gear
-
-
-def compare(sprockets, compare_small, compare_large):
-    
-    """
-    This function checks if the current sprocket value is smaller or larger
-    than the ones being compared, and updates them if needed.
-
-    :param sprockets: The current sprocket value to compare.
-    :param compare_small: The smallest sprocket value found so far.
-    :param compare_large: The largest sprocket value found so far.
-    :return: A tuple with the updated largest and smallest sprocket values.
-    """
-
-    if compare_large == 0 or sprockets > compare_large:
-        compare_large = sprockets
-    if compare_small == 0 or sprockets < compare_small:
-            compare_small = sprockets
-    return compare_large, compare_small
-
-
-def print_bike_info(bike_id, 
-                    chainring_big, 
-                    chainring_small, 
-                    cog_big, cog_small, 
-                    gear_ratio, 
+def print_bike_info(bike_id,
+                    chainring_big,
+                    chainring_small,
+                    cog_big, cog_small,
+                    gear_ratio,
                     num_gear):
-
     """
     Prints formatted bike information and the computed gear ratio.
     :param bike_id: the bike identifier (string)
@@ -237,7 +132,7 @@ def print_bike_info(bike_id,
     :param gear_ratio: computed gear ratio (float)
     :return: none
     """
-    
+
     bike_t = f"{'Bike ID':<10}"
     chainring_t = f"{'Chainring':<12}"
     cog_t = f"{'Cog':<12}"
@@ -254,7 +149,6 @@ def print_bike_info(bike_id,
 
 
 def print_outro():
-
     """
     Prints a short closing message to the user.
     :param: none
@@ -262,6 +156,98 @@ def print_outro():
     """
 
     print("\nThank you for using the bicycle gear ratio calculator!")
+
+
+def get_option():
+    option = v.get_integer("Enter your response: ")
+    return option
+
+
+def get_bike_id():
+    """
+    Prompts for the bike ID used to identify the bicycle.
+    :param: none
+    :return: bike id entered by the user, string
+    """
+
+    bike_id = v.get_string("Enter a unique bike ID: ")
+    return bike_id
+
+
+def get_sprocket(prompt):
+    """
+    This function asks the user to enter sprocket sizes and keeps track of
+    the largest, smallest, and total number of valid sprockets entered.
+
+    :param prompt: A message to show the user when asking for sprocket sizes.
+    :return: A tuple with the largest sprocket, smallest sprocket, and the 
+    total count of valid sprockets entered.
+    """
+
+    count = 0
+    compare_large = 0
+    compare_small = 0
+
+    print(f"Enter the sprocket sizes for {prompt} (enter 0 to exit): ")
+    sprockets = v.get_integer("Enter Sprocket: ")
+    while sprockets != 0:
+        if sprockets < 0:
+            print("Invalid")
+            sprockets = v.get_integer("Enter Sprocket: ")
+        while sprockets > 0:
+            count += 1
+            compare_large, compare_small = calculate_compare(sprockets,
+                                                             compare_small,
+                                                             compare_large)
+            sprockets = v.get_integer("Enter Sprocket: ")
+
+    return compare_large, compare_small, count
+
+
+def calculate_gear_ratio(chainring_big, cog_small):
+    """
+    This function finds the gear ratio by dividing the number of teeth on the
+    largest front gear by the number of smallest teeth on the back gear.
+
+    :param chainring_big: The number of teeth on the front chainring.
+    :param cog_small: The number of teeth on the rear cog.
+    :return: The gear ratio as a float.
+    """
+
+    gear_ratio = chainring_big / cog_small
+    return gear_ratio
+
+
+def calculate_num_gear(chainring_count, cog_count):
+    """
+    This function calculates the total number of gear combinations by 
+    multiplying the number of front gears by the number of rear gears.
+
+    :param chainring_count: The number of gears on the front (chainrings).
+    :param cog_count: The number of gears on the back (cogs).
+    :return: The total number of gear combinations.
+    """
+
+    num_gear = chainring_count * cog_count
+    return num_gear
+
+
+def calculate_compare(sprockets, compare_small, compare_large):
+    """
+    This function checks if the current sprocket value is smaller or larger
+    than the ones being compared, and updates them if needed.
+
+    :param sprockets: The current sprocket value to compare.
+    :param compare_small: The smallest sprocket value found so far.
+    :param compare_large: The largest sprocket value found so far.
+    :return: A tuple with the updated largest and smallest sprocket values.
+    """
+
+    if compare_large == 0 or sprockets > compare_large:
+        compare_large = sprockets
+    if compare_small == 0 or sprockets < compare_small:
+        compare_small = sprockets
+    return compare_large, compare_small
 
 
 main()
