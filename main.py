@@ -16,7 +16,8 @@
 #                           code. Added Menu loop to allow user controls.
 #                   A03.2 - 11/16/2025 - Removed logic from get_options, added
 #                           module for input validation. Changed inputs to
-#                           use the validation module and functions.
+#                           use the validation module and functions. Added
+#                           error handling for invalid inputs across get funcs
 # *****************************************************************************
 import valid as v
 
@@ -36,6 +37,8 @@ def main():
     gear_ratio = 0.00
     num_gear = 0
     option = 0
+    repeat = "y"
+    protract = "y"
 
     print_intro()
     print_options()
@@ -43,27 +46,32 @@ def main():
 
     while option != QUIT:
         if option == DESCRIPTION:
-            print("You have selected to print a program description")
-            print_description()
+            while protract.lower() != "n":
+                print_description()
+                protract = v.get_string(
+                    "Display the program description again? (y/n): ")
             print_options()
             option = get_option()
 
         elif option == SUBMIT_BIKE:
-            print("You have decided to calculate a gear ratio for a bike")
-            bike_id = get_bike_id()
-            (chainring_big,
-             chainring_small,
-             chainring_count) = get_sprocket("Chainring")
-            cog_big, cog_small, cog_count = get_sprocket("Cog")
-            gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
-            num_gear = calculate_num_gear(chainring_count, cog_count)
-            print_bike_info(bike_id,
-                            chainring_big,
-                            chainring_small,
-                            cog_big, cog_small,
-                            gear_ratio,
-                            num_gear)
+            while repeat.lower() == "y":
+                bike_id = get_bike_id()
+                (chainring_big,
+                 chainring_small,
+                 chainring_count) = get_sprocket("Chainring")
+                cog_big, cog_small, cog_count = get_sprocket("Cog")
+                gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
+                num_gear = calculate_num_gear(chainring_count, cog_count)
+                print_bike_info(bike_id,
+                                chainring_big,
+                                chainring_small,
+                                cog_big, cog_small,
+                                gear_ratio,
+                                num_gear)
 
+                repeat = v.get_string(
+                    "Would you like to enter another bike? (y/n): ")
+            print_options()
             option = get_option()
     print_outro()
 
@@ -159,7 +167,15 @@ def print_outro():
 
 
 def get_option():
+    """
+    Gets the user's menu option choice with validation.
+    :param: none
+    :return: option selected by the user, integer
+    """
     option = v.get_integer("Enter your response: ")
+    if option < DESCRIPTION or option > QUIT:
+        print("Invalid option. Please select a valid option.")
+        option = v.get_integer("Enter your response: ")
     return option
 
 
@@ -190,6 +206,9 @@ def get_sprocket(prompt):
 
     print(f"Enter the sprocket sizes for {prompt} (enter 0 to exit): ")
     sprockets = v.get_integer("Enter Sprocket: ")
+    if sprockets == 0:
+        print("Please enter at least one sprocket size.")
+        sprockets = v.get_integer("Enter Sprocket: ")
     while sprockets != 0:
         if sprockets < 0:
             print("Invalid")
