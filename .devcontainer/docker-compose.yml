@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      ssh: default  # Enables SSH forwarding during build
+    volumes:
+      - .:/workspace:cached
+      - ${SSH_AUTH_SOCK}:/ssh-agent
+    environment:
+      SSH_AUTH_SOCK: /ssh-agent
+    tty: true
