@@ -23,5 +23,11 @@
 	},
 	"forwardPorts": [8000, 8080, 5000],
 	"postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt 2>/dev/null || true",
-	"remoteUser": "vscode"
+	"remoteUser": "vscode",
+	"mounts": [
+		"source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind,consistency=cached"
+	],
+	"remoteEnv": {
+		"SSH_AUTH_SOCK": "/ssh-agent"
+	}
 }
