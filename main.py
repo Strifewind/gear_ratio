@@ -24,6 +24,8 @@ import valid as v
 DESCRIPTION = 1
 SUBMIT_BIKE = 2
 QUIT = 3
+MINIMUM = 11
+MAXIMUM = 75
 
 
 def main():
@@ -210,8 +212,9 @@ def get_sprocket(prompt):
         print("Please enter at least one sprocket size.")
         sprockets = v.get_integer("Enter Sprocket: ")
     while sprockets != 0:
-        if sprockets < 0:
-            print("Invalid")
+        if sprockets < MINIMUM or sprockets > MAXIMUM:
+            print("Invalid sprocket size,")
+            print(f"need a value between {MINIMUM} and {MAXIMUM}")
             sprockets = v.get_integer("Enter Sprocket: ")
         while sprockets > 0:
             count += 1
