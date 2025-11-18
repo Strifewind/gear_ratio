@@ -19,13 +19,14 @@
 #                           use the validation module and functions. Added
 #                           error handling for invalid inputs across get funcs
 #                   A03.3 - 11/20/2025 - Removed redundant prompts in main loop.
-#                           Fixed get_option to not reprompt after invalid input.
+#                           Fixed get_option response after invalid input.
 # *****************************************************************************
 import valid as v
 
 DESCRIPTION = 1
 SUBMIT_BIKE = 2
-QUIT = 3
+PRINT_MENU = 3
+QUIT = 4
 MINIMUM = 11
 MAXIMUM = 75
 
@@ -41,8 +42,6 @@ def main():
     gear_ratio = 0.00
     num_gear = 0
     option = 0
-    repeat = "y"
-    protract = "y"
 
     print_intro()
     print_options()
@@ -50,14 +49,10 @@ def main():
 
     while option != QUIT:
         if option == DESCRIPTION:
-            # while protract.lower() != "n":
             print_description()
-            # protract = v.get_string(
-            #    "Display the program description again? (y/n): ")
-            # print_options()
-
+        elif option == PRINT_MENU:
+            print_options()
         elif option == SUBMIT_BIKE:
-            # while repeat.lower() == "y":
             bike_id = get_bike_id()
             (chainring_big,
                 chainring_small,
@@ -71,10 +66,8 @@ def main():
                             cog_big, cog_small,
                             gear_ratio,
                             num_gear)
-
-            # repeat = v.get_string(
-            #    "Would you like to enter another bike? (y/n): ")
-        # print_options()
+        
+        print_end(option)
         option = get_option()
     print_outro()
 
@@ -103,7 +96,8 @@ Select from the following options
 
 1.     Program overview 
 2.     Enter your bike details
-3.     Close program
+3.     Print menu options
+4.     Close program
           """)
 
 
@@ -157,6 +151,19 @@ def print_bike_info(bike_id,
 
     print(f"\n{bike_t} | {chainring_t} | {cog_t} | {gear_t} | {gears_t}")
     print(f"{bike_p} | {chainring_p} | {cog_p} | {gear_p} | {gears_p}")
+
+
+def print_end(option):
+    """
+    Prints a message indicating the end of a section based on the option.
+    :param option: the menu option selected by the user (int)
+    :return: none
+    """
+
+    if option == DESCRIPTION:
+        print("\nSelect another menu option. Enter 3 to see options.")
+    elif option == SUBMIT_BIKE:
+        print("\nBike details submitted. Enter 3 to see options.")
 
 
 def print_outro():
