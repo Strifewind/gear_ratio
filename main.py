@@ -18,12 +18,15 @@
 #                           module for input validation. Changed inputs to
 #                           use the validation module and functions. Added
 #                           error handling for invalid inputs across get funcs
+#                   A03.3 - 11/20/2025 - Removed redundant prompts in main loop.
+#                           Fixed get_option response after invalid input.
 # *****************************************************************************
 import valid as v
 
 DESCRIPTION = 1
 SUBMIT_BIKE = 2
-QUIT = 3
+PRINT_MENU = 3
+QUIT = 4
 MINIMUM = 11
 MAXIMUM = 75
 
@@ -39,8 +42,6 @@ def main():
     gear_ratio = 0.00
     num_gear = 0
     option = 0
-    repeat = "y"
-    protract = "y"
 
     print_intro()
     print_options()
@@ -48,34 +49,28 @@ def main():
 
     while option != QUIT:
         if option == DESCRIPTION:
-            while protract.lower() != "n":
-                print_description()
-                protract = v.get_string(
-                    "Display the program description again? (y/n): ")
-            print_options()
-            option = get_option()
-
+            print_description()
         elif option == SUBMIT_BIKE:
-            while repeat.lower() == "y":
-                bike_id = get_bike_id()
-                (chainring_big,
-                 chainring_small,
-                 chainring_count) = get_sprocket("Chainring")
-                cog_big, cog_small, cog_count = get_sprocket("Cog")
-                gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
-                num_gear = calculate_num_gear(chainring_count, cog_count)
-                print_bike_info(bike_id,
-                                chainring_big,
-                                chainring_small,
-                                cog_big, cog_small,
-                                gear_ratio,
-                                num_gear)
-
-                repeat = v.get_string(
-                    "Would you like to enter another bike? (y/n): ")
+            bike_id = get_bike_id()
+            (chainring_big,
+                chainring_small,
+                chainring_count) = get_sprocket("Chainring")
+            cog_big, cog_small, cog_count = get_sprocket("Cog")
+            gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
+            num_gear = calculate_num_gear(chainring_count, cog_count)
+            print_bike_info(bike_id,
+                            chainring_big,
+                            chainring_small,
+                            cog_big, cog_small,
+                            gear_ratio,
+                            num_gear)
+        elif option == PRINT_MENU:
             print_options()
-            option = get_option()
-    print_outro()
+        else:
+            print("Invalid option. Please choose a valid menu item.")
+        
+        print_end(option)
+        option = get_option()
 
 
 def print_intro():
@@ -102,7 +97,8 @@ Select from the following options
 
 1.     Program overview 
 2.     Enter your bike details
-3.     Close program
+3.     Print menu options
+4.     Close program
           """)
 
 
@@ -158,6 +154,19 @@ def print_bike_info(bike_id,
     print(f"{bike_p} | {chainring_p} | {cog_p} | {gear_p} | {gears_p}")
 
 
+def print_end(option):
+    """
+    Prints a message indicating the end of a section based on the option.
+    :param option: the menu option selected by the user (int)
+    :return: none
+    """
+
+    if option == DESCRIPTION:
+        print("\nSelect another menu option. Enter 3 to see options.")
+    elif option == SUBMIT_BIKE:
+        print("\nBike details submitted. Enter 3 to see options.")
+
+
 def print_outro():
     """
     Prints a short closing message to the user.
@@ -175,9 +184,7 @@ def get_option():
     :return: option selected by the user, integer
     """
     option = v.get_integer("Enter your response: ")
-    if option < DESCRIPTION or option > QUIT:
-        print("Invalid option. Please select a valid option.")
-        option = v.get_integer("Enter your response: ")
+
     return option
 
 
@@ -202,26 +209,44 @@ def get_sprocket(prompt):
     total count of valid sprockets entered.
     """
 
+    print(f"Enter the sprocket sizes for {prompt} (enter 0 to stop): ")
+
     count = 0
     compare_large = 0
     compare_small = 0
 
-    print(f"Enter the sprocket sizes for {prompt} (enter 0 to exit): ")
-    sprockets = v.get_integer("Enter Sprocket: ")
-    if sprockets == 0:
-        print("Please enter at least one sprocket size.")
-        sprockets = v.get_integer("Enter Sprocket: ")
-    while sprockets != 0:
-        if sprockets < MINIMUM or sprockets > MAXIMUM:
+    sprocket = v.get_integer("Enter sprocket: ")
+
+    # Require at least one sprocket
+    while count == 0 and sprocket == 0:
+        print("Please ent at least one sprocket size.")
+        sprocket = v.get_interger("Enter sprocket: ")
+
+    # Main loop: keep going until user enters 0 *after* at least one valid entry
+    while sprocket != 0:
+
+        # Validate range
+        if sprocket >= MINIMUM and sprocket <= MAXIMUM:
+
+            count += 1
+
+            # Initialize largest/smallest
+            if count == 1:
+                compare_large = sprocket
+                compare_small = sprocket
+            else:
+                if sprocket > compare_large:
+                    compare_large = sprocket
+                if sprocket < compare_small:
+                    compare_small = sprocket
+        
+        else:
             print("Invalid sprocket size,")
             print(f"need a value between {MINIMUM} and {MAXIMUM}")
-            sprockets = v.get_integer("Enter Sprocket: ")
-        while sprockets > 0:
-            count += 1
-            compare_large, compare_small = calculate_compare(sprockets,
-                                                             compare_small,
-                                                             compare_large)
-            sprockets = v.get_integer("Enter Sprocket: ")
+        
+        # ASk again
+
+        sprocket = v.get_integer("Enter sprocket: ")
 
     return compare_large, compare_small, count
 
