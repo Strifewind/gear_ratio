@@ -209,26 +209,44 @@ def get_sprocket(prompt):
     total count of valid sprockets entered.
     """
 
+    print(f"Enter the sprocket sizes for {prompt} (enter 0 to stop): ")
+
     count = 0
     compare_large = 0
     compare_small = 0
 
-    print(f"Enter the sprocket sizes for {prompt} (enter 0 to exit): ")
-    sprockets = v.get_integer("Enter Sprocket: ")
-    if sprockets == 0:
-        print("Please enter at least one sprocket size.")
-        sprockets = v.get_integer("Enter Sprocket: ")
-    while sprockets != 0:
-        if sprockets < MINIMUM or sprockets > MAXIMUM:
+    sprocket = v.get_integer("Enter sprocket: ")
+
+    # Require at least one sprocket
+    while count == 0 and sprocket == 0:
+        print("Please ent at least one sprocket size.")
+        sprocket = v.get_interger("Enter sprocket: ")
+
+    # Main loop: keep going until user enters 0 *after* at least one valid entry
+    while sprocket != 0:
+
+        # Validate range
+        if sprocket >= MINIMUM and sprocket <= MAXIMUM:
+
+            count += 1
+
+            # Initialize largest/smallest
+            if count == 1:
+                compare_large = sprocket
+                compare_small = sprocket
+            else:
+                if sprocket > compare_large:
+                    compare_large = sprocket
+                if sprocket < compare_small:
+                    compare_small = sprocket
+        
+        else:
             print("Invalid sprocket size,")
             print(f"need a value between {MINIMUM} and {MAXIMUM}")
-            sprockets = v.get_integer("Enter Sprocket: ")
-        while sprockets > 0:
-            count += 1
-            compare_large, compare_small = calculate_compare(sprockets,
-                                                             compare_small,
-                                                             compare_large)
-            sprockets = v.get_integer("Enter Sprocket: ")
+        
+        # ASk again
+
+        sprocket = v.get_integer("Enter sprocket: ")
 
     return compare_large, compare_small, count
 
