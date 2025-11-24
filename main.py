@@ -50,8 +50,6 @@ def main():
     while option != QUIT:
         if option == DESCRIPTION:
             print_description()
-        elif option == PRINT_MENU:
-            print_options()
         elif option == SUBMIT_BIKE:
             bike_id = get_bike_id()
             (chainring_big,
@@ -66,10 +64,13 @@ def main():
                             cog_big, cog_small,
                             gear_ratio,
                             num_gear)
+        elif option == PRINT_MENU:
+            print_options()
+        else:
+            print("Invalid option. Please choose a valid menu item.")
         
         print_end(option)
         option = get_option()
-    print_outro()
 
 
 def print_intro():
@@ -183,8 +184,7 @@ def get_option():
     :return: option selected by the user, integer
     """
     option = v.get_integer("Enter your response: ")
-    if option < DESCRIPTION or option > QUIT:
-        print("Invalid option. Please select a valid option.")
+
     return option
 
 
