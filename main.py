@@ -182,7 +182,8 @@ def get_bike_id():
 
 def get_sprocket(prompt):
     """
-    Ask the user to enter sprocket sizes for a given component (e.g., Chainring or Cog).
+    Ask the user to enter sprocket sizes for a given 
+    component (e.g., Chainring or Cog).
     
     Rules:
     - User must enter at least one valid sprocket size before stopping.
@@ -203,7 +204,8 @@ def get_sprocket(prompt):
         if sprocket == 0:
             print("Please enter at least one sprocket size.")
         elif sprocket < MINIMUM or sprocket > MAXIMUM:
-            print(f"Invalid sprocket size, need between {MINIMUM} and {MAXIMUM}.")
+            print("Invalid sprocket size,") 
+            print(f"need between {MINIMUM} and {MAXIMUM}.")
         else:
             sprockets.append(sprocket)
 
@@ -212,7 +214,8 @@ def get_sprocket(prompt):
     # Main input loop after first valid entry
     while sprocket != 0:
         if sprocket < MINIMUM or sprocket > MAXIMUM:
-            print(f"Invalid sprocket size, need between {MINIMUM} and {MAXIMUM}.")
+            print("Invalid sprocket size,") 
+            print(f"need between {MINIMUM} and {MAXIMUM}.")
         else:
             w.insert_sorted(sprockets, sprocket)
 
