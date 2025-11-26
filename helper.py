@@ -39,8 +39,7 @@ def calculate_num_gear(chainring_count, cog_count):
 
 def extract_bike_stats(chainrings, cogs):
     """
-    Returns (ch_small, ch_big, cg_small, cg_big, ratio, num_gears)
-    NO dictionaries.
+        #TODO CHANGE the index calls for this function.
     """
 
     ch_small = chainrings[0]

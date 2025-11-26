@@ -35,7 +35,6 @@ QUIT = 4
 MINIMUM = 11
 MAXIMUM = 75
 
-
 def main():
     
     bike_id = []
@@ -155,7 +154,7 @@ def print_outro():
     :return: none
     """
 
-    print("\nThank you for using the bicycle gear ratio calculator!")
+    print("Thank you for using the bicycle gear ratio calculator!")
 
 
 def get_option():
