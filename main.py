@@ -20,57 +20,49 @@
 #                           error handling for invalid inputs across get funcs
 #                   A03.3 - 11/20/2025 - Removed redundant prompts in main loop.
 #                           Fixed get_option response after invalid input.
+#                   A04.1 - 11/24/2025 - Refactor code to utilize parellel lists
+#                           User input is going to be stored in lists in the
+#                           index which they were entered. Calculated values
+#                           will be determined before printed.
 # *****************************************************************************
 import valid as v
 
 DESCRIPTION = 1
 SUBMIT_BIKE = 2
-PRINT_MENU = 3
+PRINT_BIKES = 3
 QUIT = 4
 MINIMUM = 11
 MAXIMUM = 75
 
 
 def main():
-    bike_id = ""
-    chainring_big = 0
-    chainring_small = 0
-    chainring_count = 0
-    cog_big = 0
-    cog_small = 0
-    cog_count = 0
-    gear_ratio = 0.00
-    num_gear = 0
+    
+    bike_id = []
+    chainring_list = []
+    cog_list = []
+
     option = 0
 
-    print_intro()
-    print_options()
-    option = get_option()
+    print_intro()    
 
     while option != QUIT:
+        print_options()
+        option = get_option()
+        
         if option == DESCRIPTION:
             print_description()
+        
         elif option == SUBMIT_BIKE:
-            bike_id = get_bike_id()
-            (chainring_big,
-                chainring_small,
-                chainring_count) = get_sprocket("Chainring")
-            cog_big, cog_small, cog_count = get_sprocket("Cog")
-            gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
-            num_gear = calculate_num_gear(chainring_count, cog_count)
-            print_bike_info(bike_id,
-                            chainring_big,
-                            chainring_small,
-                            cog_big, cog_small,
-                            gear_ratio,
-                            num_gear)
-        elif option == PRINT_MENU:
-            print_options()
+            add_entry(bike_id, chainring_list, cog_list)
+
+        elif option == PRINT_BIKES:
+            process_list(bike_id, chainring_list, cog_list)
+
+        elif option == QUIT:
+            print_outro()
+
         else:
             print("Invalid option. Please choose a valid menu item.")
-        
-        print_end(option)
-        option = get_option()
 
 
 def print_intro():
@@ -96,8 +88,8 @@ def print_options():
 Select from the following options
 
 1.     Program overview 
-2.     Enter your bike details
-3.     Print menu options
+2.     Add bike entry
+3.     List added bikes
 4.     Close program
           """)
 
@@ -154,19 +146,6 @@ def print_bike_info(bike_id,
     print(f"{bike_p} | {chainring_p} | {cog_p} | {gear_p} | {gears_p}")
 
 
-def print_end(option):
-    """
-    Prints a message indicating the end of a section based on the option.
-    :param option: the menu option selected by the user (int)
-    :return: none
-    """
-
-    if option == DESCRIPTION:
-        print("\nSelect another menu option. Enter 3 to see options.")
-    elif option == SUBMIT_BIKE:
-        print("\nBike details submitted. Enter 3 to see options.")
-
-
 def print_outro():
     """
     Prints a short closing message to the user.
@@ -199,56 +178,73 @@ def get_bike_id():
     return bike_id
 
 
+def insert_sorted(s, value):
+    """
+    Insert a value into a list while keeping it sorted (ascending).
+    Uses only while loops, no built-in sorting.
+    """
+    i = 0
+    while i < len(s) and s[i] < value:
+        i += 1
+    s.insert(i, value)
+
+
 def get_sprocket(prompt):
     """
-    This function asks the user to enter sprocket sizes and keeps track of
-    the largest, smallest, and total number of valid sprockets entered.
-
-    :param prompt: A message to show the user when asking for sprocket sizes.
-    :return: A tuple with the largest sprocket, smallest sprocket, and the 
-    total count of valid sprockets entered.
+    Ask the user to enter sprocket sizes for a given component (e.g., Chainring or Cog).
+    
+    Rules:
+    - User must enter at least one valid sprocket size before stopping.
+    - Input '0' means stop (but only after the first valid value).
+    - Valid sprocket sizes fall between MINIMUM and MAXIMUM.
+    - Values are inserted in sorted order as they are entered.
+    
+    Returns:
+        A sorted list of all valid sprocket sizes entered.
     """
-
     print(f"Enter the sprocket sizes for {prompt} (enter 0 to stop): ")
 
-    count = 0
-    compare_large = 0
-    compare_small = 0
-
+    sprockets = []
     sprocket = v.get_integer("Enter sprocket: ")
 
-    # Require at least one sprocket
-    while count == 0 and sprocket == 0:
-        print("Please ent at least one sprocket size.")
-        sprocket = v.get_interger("Enter sprocket: ")
-
-    # Main loop: keep going until user enters 0 *after* at least one valid entry
-    while sprocket != 0:
-
-        # Validate range
-        if sprocket >= MINIMUM and sprocket <= MAXIMUM:
-
-            count += 1
-
-            # Initialize largest/smallest
-            if count == 1:
-                compare_large = sprocket
-                compare_small = sprocket
-            else:
-                if sprocket > compare_large:
-                    compare_large = sprocket
-                if sprocket < compare_small:
-                    compare_small = sprocket
-        
+    # Require at least one valid sprocket
+    while len(sprockets) == 0:
+        if sprocket == 0:
+            print("Please enter at least one sprocket size.")
+        elif sprocket < MINIMUM or sprocket > MAXIMUM:
+            print(f"Invalid sprocket size, need between {MINIMUM} and {MAXIMUM}.")
         else:
-            print("Invalid sprocket size,")
-            print(f"need a value between {MINIMUM} and {MAXIMUM}")
-        
-        # ASk again
+            sprockets.append(sprocket)
 
         sprocket = v.get_integer("Enter sprocket: ")
 
-    return compare_large, compare_small, count
+    # Main input loop after first valid entry
+    while sprocket != 0:
+        if sprocket < MINIMUM or sprocket > MAXIMUM:
+            print(f"Invalid sprocket size, need between {MINIMUM} and {MAXIMUM}.")
+        else:
+            insert_sorted(sprockets, sprocket)
+
+        sprocket = v.get_integer("Enter sprocket: ")
+
+    return sprockets
+
+
+
+def add_entry(bike_id, chainring_list, cog_list):
+
+    print("\n--- Add a New Bike Entry ---")
+    bike_id.append(get_bike_id())
+
+    chainring_list.append(get_sprocket("Chainring"))
+
+    cog_list.append(get_sprocket("Cog"))
+
+    # print(bike_id)
+    # print(chainring_list)
+    # print(cog_list)
+    # print("#TODO")
+    #TODO
 
 
 def calculate_gear_ratio(chainring_big, cog_small):
@@ -297,4 +293,11 @@ def calculate_compare(sprockets, compare_small, compare_large):
     return compare_large, compare_small
 
 
+def process_list(bike_id, chainring_list, cog_list):
+
+    #TODO
+    print("todo")
+
+
 main()
+
