@@ -7,14 +7,14 @@ def get_integer(prompt):
     num = 0
     valid = False
 
-    while valid != True:
+    while not valid:
         try:
             num = int(input(prompt))
-            while num < 0 or num == "":
+            while num < 0:
                 print("Invalid integer. Please enter an integer.")
                 num = int(input(prompt))
             valid = True
-        except:
+        except ValueError:
             print("Invalid integer.")
 
     return num
@@ -29,7 +29,7 @@ def get_string(prompt):
     strand = ""
     valid = False
 
-    while valid != True:
+    while not valid:
         strand = input(prompt)
         if strand == "":
             print("Invalid string. Please enter a string.")

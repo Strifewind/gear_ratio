@@ -25,7 +25,7 @@ def calculate_gear_ratio(chainring_big, cog_small):
 
 def calculate_num_gear(chainring_count, cog_count):
     """
-    This function calculates the total number of gear combinations by 
+    This function calculates the total number of gear combinations by
     multiplying the number of front gears by the number of rear gears.
 
     :param chainring_count: The number of gears on the front (chainrings).
@@ -37,16 +37,43 @@ def calculate_num_gear(chainring_count, cog_count):
     return num_gear
 
 
+def is_duplicate(value, lst):
+    """
+    provides a comparison for duplicate values within a list.
+
+    :param value: The value to search for.
+    :param lst: The list to search in.
+    :return: True if value is found, False otherwise.
+    """
+    i = 0
+    confirm = False
+    while i < len(lst):
+        if lst[i] == value:
+            confirm = True
+        i += 1
+    return confirm
+
+
 def extract_bike_stats(chainrings, cogs):
     """
-        #TODO CHANGE the index calls for this function.
+    Extract key statistics from bike drivetrain components.
+
+    :param chainrings: List of chainring sizes (e.g., [small, ..., big]).
+    :param cogs: List of cog sizes (e.g., [small, ..., big]).
+    :return: Tuple containing:
+        - ch_small (int): Size of the smallest chainring.
+        - ch_big (int): Size of the largest chainring.
+        - cg_small (int): Size of the smallest cog.
+        - cg_big (int): Size of the largest cog.
+        - ratio (float): Gear ratio calculated using largest chainring and smallest cog.
+        - num_gears (int): Total number of gear combinations.
     """
 
     ch_small = chainrings[0]
-    ch_big   = chainrings[-1]
+    ch_big   = chainrings[len(chainrings)-1]
 
     cg_small = cogs[0]
-    cg_big   = cogs[-1]
+    cg_big   = cogs[len(cogs)-1]
 
     ratio = calculate_gear_ratio(ch_big, cg_small)
     num_gears = calculate_num_gear(len(chainrings), len(cogs))
