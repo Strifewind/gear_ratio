@@ -124,6 +124,23 @@ speed (flats).
     )
 
 
+def print_bike_header():
+    """
+    Print a formatted header for bike-related data, including columns for
+    Bike ID, Chainring, Cog, Gear Ratio, and Number of Gears.
+
+    :return: None
+    """
+
+    bike_t = f"{'Bike ID':<10}"
+    chainring_t = f"{'Chainring':<12}"
+    cog_t = f"{'Cog':<12}"
+    gear_t = f"{'Gear Ratio':<12}"
+    gears_t = f"{'# Gears':<8}"
+
+    print(f"\n{bike_t} | {chainring_t} | {cog_t} | {gear_t} | {gears_t}")
+
+
 def print_bike_info(
                     bike_id, 
                     chainring_big, 
@@ -145,19 +162,12 @@ def print_bike_info(
     :param num_gears: Total number of gear combinations (int)
     """
 
-    bike_t = f"{'Bike ID':<10}"
-    chainring_t = f"{'Chainring':<12}"
-    cog_t = f"{'Cog':<12}"
-    gear_t = f"{'Gear Ratio':<12}"
-    gears_t = f"{'# Gears':<8}"
-
     bike_p = f"{bike_id:<10}"
     chainring_p = f"{f'{chainring_small}-{chainring_big}':<12}"
     cog_p = f"{f'{cog_small}-{cog_big}':<12}"
     gear_p = f"{gear_ratio:<12.2f}"
     gears_p = f"{num_gear:<8}"
 
-    print(f"\n{bike_t} | {chainring_t} | {cog_t} | {gear_t} | {gears_t}")
     print(f"{bike_p} | {chainring_p} | {cog_p} | {gear_p} | {gears_p}")
 
 
@@ -248,7 +258,22 @@ def get_sprocket(prompt):
         sprocket = v.get_integer("Enter sprocket: ")
 
     return sprockets
+
+
 def add_entry(bike_id, chainring_list, cog_list):
+    """
+    Add a new bike entry to the system by appending a bike ID, chainring, and cog
+    to their respective lists. This method interacts with helper functions to
+    retrieve user input for each component.
+
+    :param bike_id: A list storing all bike IDs; the new bike ID will be appended.
+    :type bike_id: list[str]
+    :param chainring_list: A list storing chainring sizes; the new chainring will be appended.
+    :type chainring_list: list[int]
+    :param cog_list: A list storing cog sizes; the new cog will be appended.
+    :type cog_list: list[int]
+    :return: None
+    """
 
     print("\n--- Add a New Bike Entry ---")
     bike_id.append(get_bike_id(bike_id))
@@ -259,12 +284,27 @@ def add_entry(bike_id, chainring_list, cog_list):
 
 
 def process_list(bike_id, chainring_list, cog_list):
+    """
+    Display all stored bike entries along with their calculated statistics.
+    If no bikes are stored, a message is displayed. For each bike, the function
+    prints its ID, chainring and cog details, gear ratio, and number of gears.
+
+    :param bike_id: A list of bike IDs to be displayed.
+    :type bike_id: list[str]
+    :param chainring_list: A list of chainring sizes for each bike.
+    :type chainring_list: list[int]
+    :param cog_list: A list of cog sizes for each bike.
+    :type cog_list: list[int]
+    :return: None
+    """
 
     if len(bike_id) == 0:
         print("No bikes stored yet.\n")
     else:
 
         print("\n--- Stored Bike Entries ---")
+
+        print_bike_header()
 
         index = 0
         while index < len(bike_id):
@@ -290,6 +330,19 @@ def process_list(bike_id, chainring_list, cog_list):
 
 
 def print_statistics(bike_id, chainring_list, cog_list):
+    """
+    Calculate and display statistics for stored bikes, including the bike with
+    the best climbing ratio (lowest gear ratio) and the bike with the best
+    top-speed ratio (highest gear ratio). If no bikes are stored, a message is displayed.
+
+    :param bike_id: A list of bike IDs used to identify each bike.
+    :type bike_id: list[str]
+    :param chainring_list: A list of chainring sizes for each bike.
+    :type chainring_list: list[int]
+    :param cog_list: A list of cog sizes for each bike.
+    :type cog_list: list[int]
+    :return: None
+    """
 
     if len(bike_id) == 0:
         print("No statistics available.\n")
