@@ -1,6 +1,6 @@
 # *****************************************************************************
 # Author:           Brian O'Grady
-# Assignment:       Assignment 03
+# Assignment:       Assignment 04
 # Date:             11/10/2025
 # Description:      This program calculates the gear ratio by dividing the
 #                   number of teeth on the front chainring by the number
@@ -18,59 +18,53 @@
 #                           module for input validation. Changed inputs to
 #                           use the validation module and functions. Added
 #                           error handling for invalid inputs across get funcs
-#                   A03.3 - 11/20/2025 - Removed redundant prompts in main loop.
+#                   A03.3 - 11/20/2025 - Removed redundant prompts in main loop
 #                           Fixed get_option response after invalid input.
+#                   A04.1 - 11/24/2025 - Refactor code utilizing parellel lists
+#                           User input is going to be stored in lists in the
+#                           index which they were entered. Calculated values
+#                           will be determined before printed.
 # *****************************************************************************
 import valid as v
+import helper as w
 
 DESCRIPTION = 1
 SUBMIT_BIKE = 2
-PRINT_MENU = 3
+PRINT_BIKES = 3
 QUIT = 4
 MINIMUM = 11
 MAXIMUM = 75
 
 
 def main():
-    bike_id = ""
-    chainring_big = 0
-    chainring_small = 0
-    chainring_count = 0
-    cog_big = 0
-    cog_small = 0
-    cog_count = 0
-    gear_ratio = 0.00
-    num_gear = 0
+
+    bike_id = []
+    chainring_list = []
+    cog_list = []
+
     option = 0
 
     print_intro()
-    print_options()
-    option = get_option()
 
     while option != QUIT:
+        print_options()
+        option = get_option()
+
         if option == DESCRIPTION:
             print_description()
+
         elif option == SUBMIT_BIKE:
-            bike_id = get_bike_id()
-            (chainring_big,
-                chainring_small,
-                chainring_count) = get_sprocket("Chainring")
-            cog_big, cog_small, cog_count = get_sprocket("Cog")
-            gear_ratio = calculate_gear_ratio(chainring_big, cog_small)
-            num_gear = calculate_num_gear(chainring_count, cog_count)
-            print_bike_info(bike_id,
-                            chainring_big,
-                            chainring_small,
-                            cog_big, cog_small,
-                            gear_ratio,
-                            num_gear)
-        elif option == PRINT_MENU:
-            print_options()
+            add_entry(bike_id, chainring_list, cog_list)
+
+        elif option == PRINT_BIKES:
+            process_list(bike_id, chainring_list, cog_list)
+
+        elif option == QUIT:
+            print_statistics(bike_id, chainring_list, cog_list)
+            print_outro()
+
         else:
             print("Invalid option. Please choose a valid menu item.")
-        
-        print_end(option)
-        option = get_option()
 
 
 def print_intro():
@@ -86,20 +80,21 @@ def print_intro():
 
 def print_options():
     """
-    Displays a list of menu options for the user to choose from.
-
+    Prints a list of menu options for the user to choose from.
     :param: None
     :return: None
     """
 
-    print("""
+    print(
+        """
 Select from the following options
 
 1.     Program overview 
-2.     Enter your bike details
-3.     Print menu options
+2.     Add bike entry
+3.     List added bikes
 4.     Close program
-          """)
+          """
+    )
 
 
 def print_description():
@@ -114,29 +109,27 @@ def print_description():
     :return: None
     """
 
-    print("""
-Input your chainring and cog sizes to find the perfect ratio!\n
+    print(
+        """
+Input your chainring and cog sizes to find the perfect ratio!
+
 \tGear ratio = Chainring teeth / Cog teeth
-\t# Gears = count of chainring + count of cog\n
-A lower gear ratio will mean easier pedaling, ideal for climbing hills.
-While a higher gear ratio means harder pedaling but more speed, ideal
-for flat roads.
-          """)
+\t# Gears = count(chainrings) * count(cogs)
+
+Lower ratio (smallest chainring / largest cog) -> easier pedaling (climbs).
+Higher ratio (largest chainring / smallest cog) -> harder pedaling but more
+speed (flats).
+
+          """
+    )
 
 
-def print_bike_info(bike_id,
-                    chainring_big,
-                    chainring_small,
-                    cog_big, cog_small,
-                    gear_ratio,
-                    num_gear):
+def print_bike_header():
     """
-    Prints formatted bike information and the computed gear ratio.
-    :param bike_id: the bike identifier (string)
-    :param chainring: number of teeth on the front chainring (int)
-    :param cog: number of teeth on the rear cog (int)
-    :param gear_ratio: computed gear ratio (float)
-    :return: none
+    Print a formatted header for bike-related data, including columns for
+    Bike ID, Chainring, Cog, Gear Ratio, and Number of Gears.
+
+    :return: None
     """
 
     bike_t = f"{'Bike ID':<10}"
@@ -144,27 +137,38 @@ def print_bike_info(bike_id,
     cog_t = f"{'Cog':<12}"
     gear_t = f"{'Gear Ratio':<12}"
     gears_t = f"{'# Gears':<8}"
+
+    print(f"\n{bike_t} | {chainring_t} | {cog_t} | {gear_t} | {gears_t}")
+
+
+def print_bike_info(
+                    bike_id, 
+                    chainring_big, 
+                    chainring_small, 
+                    cog_big, 
+                    cog_small, 
+                    gear_ratio, 
+                    num_gear):
+    """
+    Prints formatted bike information including gear ratios and gear count.
+
+    :param bike_id: Unique identifier for the bike (string)
+    :param chainring_big: Largest chainring size (int)
+    :param chainring_small: Smallest chainring size (int)
+    :param cog_big: Largest cog size (int)
+    :param cog_small: Smallest cog size (int)
+    :param low_ratio: Lowest gear ratio (float)
+    :param high_ratio: Highest gear ratio (float)
+    :param num_gears: Total number of gear combinations (int)
+    """
+
     bike_p = f"{bike_id:<10}"
     chainring_p = f"{f'{chainring_small}-{chainring_big}':<12}"
     cog_p = f"{f'{cog_small}-{cog_big}':<12}"
     gear_p = f"{gear_ratio:<12.2f}"
     gears_p = f"{num_gear:<8}"
 
-    print(f"\n{bike_t} | {chainring_t} | {cog_t} | {gear_t} | {gears_t}")
     print(f"{bike_p} | {chainring_p} | {cog_p} | {gear_p} | {gears_p}")
-
-
-def print_end(option):
-    """
-    Prints a message indicating the end of a section based on the option.
-    :param option: the menu option selected by the user (int)
-    :return: none
-    """
-
-    if option == DESCRIPTION:
-        print("\nSelect another menu option. Enter 3 to see options.")
-    elif option == SUBMIT_BIKE:
-        print("\nBike details submitted. Enter 3 to see options.")
 
 
 def print_outro():
@@ -174,7 +178,7 @@ def print_outro():
     :return: none
     """
 
-    print("\nThank you for using the bicycle gear ratio calculator!")
+    print("Thank you for using the bicycle gear ratio calculator!")
 
 
 def get_option():
@@ -184,117 +188,207 @@ def get_option():
     :return: option selected by the user, integer
     """
     option = v.get_integer("Enter your response: ")
-
     return option
 
 
-def get_bike_id():
+def get_bike_id(bike_id_list):
     """
     Prompts for the bike ID used to identify the bicycle.
-    :param: none
+    Enforces uniqueness—rejects IDs already in the list.
+    :param bike_id_list: List of existing bike IDs (list of str)
     :return: bike id entered by the user, string
     """
 
-    bike_id = v.get_string("Enter a unique bike ID: ")
-    return bike_id
+    while True:
+        bike_id = v.get_string("Enter a unique bike ID: ")
+        if w.is_duplicate(bike_id, bike_id_list):
+            print(f"Bike ID '{bike_id}' already exists.")
+            print("Please enter a unique ID.")
+        else:
+            return bike_id
 
 
 def get_sprocket(prompt):
     """
-    This function asks the user to enter sprocket sizes and keeps track of
-    the largest, smallest, and total number of valid sprockets entered.
+    Ask the user to enter sprocket sizes for a given 
+    component (e.g., Chainring or Cog).
+    
+    Rules:
+    - User must enter at least one valid sprocket size before stopping.
+    - Input '0' means stop (but only after the first valid value).
+    - Valid sprocket sizes fall between MINIMUM and MAXIMUM.
+    - Values are inserted in sorted order.
+    - Duplicate sprocket sizes are rejected.
+    
+    :param prompt: Name of the component (string)
+    :return: Sorted list of sprocket sizes (list of int)
 
-    :param prompt: A message to show the user when asking for sprocket sizes.
-    :return: A tuple with the largest sprocket, smallest sprocket, and the 
-    total count of valid sprockets entered.
     """
-
     print(f"Enter the sprocket sizes for {prompt} (enter 0 to stop): ")
 
-    count = 0
-    compare_large = 0
-    compare_small = 0
-
+    sprockets = []
     sprocket = v.get_integer("Enter sprocket: ")
 
-    # Require at least one sprocket
-    while count == 0 and sprocket == 0:
-        print("Please ent at least one sprocket size.")
-        sprocket = v.get_interger("Enter sprocket: ")
-
-    # Main loop: keep going until user enters 0 *after* at least one valid entry
-    while sprocket != 0:
-
-        # Validate range
-        if sprocket >= MINIMUM and sprocket <= MAXIMUM:
-
-            count += 1
-
-            # Initialize largest/smallest
-            if count == 1:
-                compare_large = sprocket
-                compare_small = sprocket
-            else:
-                if sprocket > compare_large:
-                    compare_large = sprocket
-                if sprocket < compare_small:
-                    compare_small = sprocket
-        
+    # Require at least one valid sprocket
+    while len(sprockets) == 0:
+        if sprocket == 0:
+            print("Please enter at least one sprocket size.")
+        elif sprocket < MINIMUM or sprocket > MAXIMUM:
+            print("Invalid sprocket size,") 
+            print(f"need between {MINIMUM} and {MAXIMUM}.")
+        elif w.is_duplicate(sprocket, sprockets):
+            print(f"Sprocket size {sprocket} already entered.") 
+            print("Please enter a different size.")
         else:
-            print("Invalid sprocket size,")
-            print(f"need a value between {MINIMUM} and {MAXIMUM}")
-        
-        # ASk again
+            sprockets.append(sprocket)
 
         sprocket = v.get_integer("Enter sprocket: ")
 
-    return compare_large, compare_small, count
+    # Main input loop after first valid entry
+    while sprocket != 0:
+        if sprocket < MINIMUM or sprocket > MAXIMUM:
+            print("Invalid sprocket size,") 
+            print(f"need between {MINIMUM} and {MAXIMUM}.")
+        elif w.is_duplicate(sprocket, sprockets):
+            print(f"Sprocket size {sprocket} already entered.") 
+            print("Please enter a different size.")
+        else:
+            w.insert_sorted(sprockets, sprocket)
+
+        sprocket = v.get_integer("Enter sprocket: ")
+
+    return sprockets
 
 
-def calculate_gear_ratio(chainring_big, cog_small):
+def add_entry(bike_id, chainring_list, cog_list):
     """
-    This function finds the gear ratio by dividing the number of teeth on the
-    largest front gear by the number of smallest teeth on the back gear.
+    Add a new bike entry to the system by appending a bike ID, chainring, and cog
+    to their respective lists. This method interacts with helper functions to
+    retrieve user input for each component.
 
-    :param chainring_big: The number of teeth on the front chainring.
-    :param cog_small: The number of teeth on the rear cog.
-    :return: The gear ratio as a float.
-    """
-
-    gear_ratio = chainring_big / cog_small
-    return gear_ratio
-
-
-def calculate_num_gear(chainring_count, cog_count):
-    """
-    This function calculates the total number of gear combinations by 
-    multiplying the number of front gears by the number of rear gears.
-
-    :param chainring_count: The number of gears on the front (chainrings).
-    :param cog_count: The number of gears on the back (cogs).
-    :return: The total number of gear combinations.
-    """
-
-    num_gear = chainring_count * cog_count
-    return num_gear
-
-
-def calculate_compare(sprockets, compare_small, compare_large):
-    """
-    This function checks if the current sprocket value is smaller or larger
-    than the ones being compared, and updates them if needed.
-
-    :param sprockets: The current sprocket value to compare.
-    :param compare_small: The smallest sprocket value found so far.
-    :param compare_large: The largest sprocket value found so far.
-    :return: A tuple with the updated largest and smallest sprocket values.
+    :param bike_id: A list storing all bike IDs; the new bike ID will be appended.
+    :type bike_id: list[str]
+    :param chainring_list: A list storing chainring sizes; the new chainring will be appended.
+    :type chainring_list: list[int]
+    :param cog_list: A list storing cog sizes; the new cog will be appended.
+    :type cog_list: list[int]
+    :return: None
     """
 
-    if compare_large == 0 or sprockets > compare_large:
-        compare_large = sprockets
-    if compare_small == 0 or sprockets < compare_small:
-        compare_small = sprockets
-    return compare_large, compare_small
+    print("\n--- Add a New Bike Entry ---")
+    bike_id.append(get_bike_id(bike_id))
+
+    chainring_list.append(get_sprocket("Chainring"))
+
+    cog_list.append(get_sprocket("Cog"))
+
+
+def process_list(bike_id, chainring_list, cog_list):
+    """
+    Display all stored bike entries along with their calculated statistics.
+    If no bikes are stored, a message is displayed. For each bike, the function
+    prints its ID, chainring and cog details, gear ratio, and number of gears.
+
+    :param bike_id: A list of bike IDs to be displayed.
+    :type bike_id: list[str]
+    :param chainring_list: A list of chainring sizes for each bike.
+    :type chainring_list: list[int]
+    :param cog_list: A list of cog sizes for each bike.
+    :type cog_list: list[int]
+    :return: None
+    """
+
+    if len(bike_id) == 0:
+        print("No bikes stored yet.\n")
+    else:
+
+        print("\n--- Stored Bike Entries ---")
+
+        print_bike_header()
+
+        index = 0
+        while index < len(bike_id):
+
+            (ch_small, 
+             ch_big, 
+             cg_small, 
+             cg_big, 
+             ratio, 
+             num_gears) = w.extract_bike_stats(chainring_list[index],
+                                                cog_list[index])
+
+            print_bike_info(
+                bike_id[index], 
+                ch_big, 
+                ch_small, 
+                cg_big, 
+                cg_small, 
+                ratio, 
+                num_gears)
+
+            index = index + 1
+
+
+def print_statistics(bike_id, chainring_list, cog_list):
+    """
+    Calculate and display statistics for stored bikes, including the bike with
+    the best climbing ratio (lowest gear ratio) and the bike with the best
+    top-speed ratio (highest gear ratio). If no bikes are stored, a message is displayed.
+
+    :param bike_id: A list of bike IDs used to identify each bike.
+    :type bike_id: list[str]
+    :param chainring_list: A list of chainring sizes for each bike.
+    :type chainring_list: list[int]
+    :param cog_list: A list of cog sizes for each bike.
+    :type cog_list: list[int]
+    :return: None
+    """
+
+    if len(bike_id) == 0:
+        print("No statistics available.\n")
+    else:
+
+        (ch_small, 
+         ch_big, 
+         cg_small, 
+         cg_big, 
+         ratio, 
+         num_gears) = w.extract_bike_stats(chainring_list[0], 
+                                           cog_list[0])
+
+        best_climb_ratio = ratio
+        best_climb_index = 0
+
+        best_speed_ratio = ratio
+        best_speed_index = 0
+
+        index = 1
+        while index < len(bike_id):
+
+            stats = w.extract_bike_stats(chainring_list[index], 
+                                         cog_list[index])
+
+            curr_ratio = stats[4]  # ratio value
+
+            if curr_ratio < best_climb_ratio:
+                best_climb_ratio = curr_ratio
+                best_climb_index = index
+
+            if curr_ratio > best_speed_ratio:
+                best_speed_ratio = curr_ratio
+                best_speed_index = index
+
+            index = index + 1
+
+        print("\n--- Statistics ---")
+
+        print("Bike with BEST climbing ratio (lowest):")
+        print(f"  {bike_id[best_climb_index]}")
+        print(f"  Ratio = {best_climb_ratio:.2f}\n")
+
+        print("Bike with BEST top-speed ratio (highest):")
+        print(f"  {bike_id[best_speed_index]}")
+        print(f"  Ratio = {best_speed_ratio:.2f}\n")
 
 
 main()
